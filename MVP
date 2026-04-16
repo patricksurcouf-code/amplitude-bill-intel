@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Amplitude — BILL Prospect Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --orange: #FF5C35;
+  --orange-dim: rgba(255,92,53,0.12);
+  --orange-glow: rgba(255,92,53,0.06);
+  --bg: #0C0C10;
+  --bg2: #13131A;
+  --bg3: #1C1C26;
+  --border: rgba(255,255,255,0.07);
+  --border-hover: rgba(255,255,255,0.14);
+  --text: #EEEAF4;
+  --text2: #8B87A0;
+  --text3: #4E4A62;
+  --green: #10B981;
+  --green-dim: rgba(16,185,129,0.1);
+  --purple: #7C6FCD;
+  --purple-dim: rgba(124,111,205,0.1);
+  --teal: #0ABFAD;
+  --teal-dim: rgba(10,191,173,0.1);
+  --amber: #F59E0B;
+  --amber-dim: rgba(245,158,11,0.1);
+}
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* noise overlay */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.4;
+}
+
+/* ── TOP BAR ── */
+.topbar {
+  position: sticky; top: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 28px;
+  height: 52px;
+  background: rgba(12,12,16,0.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 0.5px solid var(--border);
+}
+.logo { display: flex; align-items: center; gap: 9px; }
+.logo-mark {
+  width: 26px; height: 26px; background: var(--orange);
+  border-radius: 7px; display: flex; align-items: center; justify-content: center;
+}
+.logo-mark svg { width: 14px; height: 14px; }
+.logo-name { font-size: 14px; font-weight: 600; letter-spacing: -0.01em; }
+.logo-sep { color: var(--text3); font-size: 14px; margin: 0 2px; }
+.logo-sub { font-size: 13px; color: var(--text2); font-weight: 400; }
+.topbar-right { display: flex; align-items: center; gap: 10px; }
+.version-badge {
+  font-size: 11px; font-weight: 500; font-family: 'DM Mono', monospace;
+  color: var(--orange); background: var(--orange-dim);
+  border: 0.5px solid rgba(255,92,53,0.25);
+  border-radius: 20px; padding: 3px 10px;
+}
+
+/* ── HERO ── */
+.hero {
+  position: relative; z-index: 1;
+  padding: 52px 28px 36px;
+  max-width: 900px; margin: 0 auto;
+}
+.hero-eyebrow {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 11px; font-weight: 500; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--text3); margin-bottom: 20px;
+}
+.eyebrow-line { height: 1px; width: 24px; background: var(--text3); }
+.hero-company {
+  display: flex; align-items: center; gap: 16px; margin-bottom: 10px;
+}
+.company-logo-wrap {
+  width: 44px; height: 44px; border-radius: 10px;
+  background: var(--bg3); border: 0.5px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; font-weight: 700; color: var(--text);
+  font-family: 'DM Mono', monospace;
+}
+.hero-title {
+  font-size: 28px; font-weight: 600; letter-spacing: -0.03em; line-height: 1.1;
+}
+.hero-title span { color: var(--orange); }
+.hero-meta {
+  display: flex; gap: 20px; margin-top: 16px; flex-wrap: wrap;
+}
+.meta-item {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 12px; color: var(--text2);
+}
+.meta-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--green); }
+.meta-dot.amber { background: var(--amber); }
+
+/* ── TABS ── */
+.tabs-wrap {
+  position: relative; z-index: 1;
+  max-width: 900px; margin: 0 auto;
+  padding: 0 28px;
+  border-bottom: 0.5px solid var(--border);
+}
+.tabs { display: flex; gap: 0; }
+.tab {
+  padding: 12px 18px; font-size: 13px; font-weight: 500;
+  color: var(--text3); background: none; border: none;
+  cursor: pointer; position: relative; transition: color .15s;
+  white-space: nowrap; letter-spacing: -0.01em;
+}
+.tab:hover { color: var(--text2); }
+.tab.active { color: var(--text); }
+.tab.active::after {
+  content: ''; position: absolute; bottom: -0.5px; left: 0; right: 0;
+  height: 1.5px; background: var(--orange); border-radius: 2px;
+}
+.tab-num {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 18px; height: 18px; border-radius: 5px;
+  background: var(--bg3); font-size: 10px; font-weight: 600;
+  color: var(--text3); margin-left: 6px; font-family: 'DM Mono', monospace;
+  transition: all .15s;
+}
+.tab.active .tab-num { background: var(--orange-dim); color: var(--orange); }
+
+/* ── CONTENT ── */
+.content {
+  position: relative; z-index: 1;
+  max-width: 900px; margin: 0 auto;
+  padding: 28px 28px 60px;
+}
+.panel { display: none; }
+.panel.active { display: block; animation: fadeUp .2s ease; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ── SECTION LABEL ── */
+.section-label {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--text3); margin-bottom: 14px;
+}
+
+/* ── THEME CARDS ── */
+.theme-card {
+  background: var(--bg2); border: 0.5px solid var(--border);
+  border-radius: 14px; padding: 20px 22px; margin-bottom: 12px;
+  transition: border-color .15s;
+}
+.theme-card:hover { border-color: var(--border-hover); }
+.theme-header { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 12px; }
+.rank {
+  width: 28px; height: 28px; border-radius: 8px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; font-family: 'DM Mono', monospace;
+}
+.r1 { background: rgba(255,92,53,0.15); color: var(--orange); }
+.r2 { background: rgba(245,158,11,0.15); color: var(--amber); }
+.r3 { background: rgba(124,111,205,0.15); color: var(--purple); }
+.r4 { background: rgba(10,191,173,0.15); color: var(--teal); }
+.r5 { background: rgba(139,135,160,0.15); color: var(--text2); }
+.theme-name { font-size: 15px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.3; }
+.theme-desc { font-size: 13px; color: var(--text2); line-height: 1.65; margin-bottom: 14px; }
+.vol-track { height: 3px; background: var(--bg3); border-radius: 2px; margin-bottom: 10px; }
+.vol-fill { height: 3px; border-radius: 2px; transition: width .6s ease; }
+.v1 { background: var(--orange); width: 100%; }
+.v2 { background: var(--amber); width: 75%; }
+.v3 { background: var(--purple); width: 55%; }
+.v4 { background: var(--teal); width: 38%; }
+.v5 { background: var(--text3); width: 25%; }
+.vol-label { font-size: 11px; color: var(--text3); font-family: 'DM Mono', monospace; margin-bottom: 14px; }
+
+.quotes-toggle {
+  font-size: 12px; color: var(--text3); background: none; border: none;
+  cursor: pointer; display: flex; align-items: center; gap: 5px;
+  padding: 0; transition: color .15s;
+}
+.quotes-toggle:hover { color: var(--text2); }
+.toggle-arrow { font-size: 9px; transition: transform .15s; }
+.quotes-toggle.open .toggle-arrow { transform: rotate(90deg); }
+
+.quotes { display: none; margin-top: 14px; }
+.quotes.open { display: block; }
+.quote-item {
+  border-left: 1.5px solid var(--border-hover);
+  padding: 8px 14px; margin-bottom: 10px;
+}
+.quote-item:last-child { margin-bottom: 0; }
+.quote-text { font-size: 12px; color: var(--text2); line-height: 1.65; font-style: italic; margin-bottom: 4px; }
+.quote-source { font-size: 10px; color: var(--text3); font-family: 'DM Mono', monospace; }
+
+/* ── CAPABILITY MAP ── */
+.cap-card {
+  background: var(--bg2); border: 0.5px solid var(--border);
+  border-radius: 14px; padding: 20px 22px; margin-bottom: 12px;
+  transition: border-color .15s;
+}
+.cap-card:hover { border-color: var(--border-hover); }
+.cap-header { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.cap-rank { font-size: 11px; color: var(--text3); font-family: 'DM Mono', monospace; min-width: 24px; }
+.cap-theme-name { font-size: 14px; font-weight: 600; letter-spacing: -0.01em; }
+.cap-row { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
+.cap-row:last-child { margin-bottom: 0; }
+.cap-badge {
+  font-size: 10px; font-weight: 600; padding: 3px 9px; border-radius: 20px;
+  white-space: nowrap; flex-shrink: 0; margin-top: 1px;
+  font-family: 'DM Mono', monospace; letter-spacing: 0.03em;
+}
+.primary { background: var(--orange-dim); color: var(--orange); border: 0.5px solid rgba(255,92,53,0.2); }
+.secondary { background: var(--bg3); color: var(--text2); border: 0.5px solid var(--border); }
+.cap-text { font-size: 13px; color: var(--text2); line-height: 1.65; }
+.cap-name { color: var(--text); font-weight: 500; }
+.cap-divider { height: 0.5px; background: var(--border); margin: 14px 0; }
+
+/* ── OPENER / EMAIL ── */
+.copy-block {
+  background: var(--bg2); border: 0.5px solid var(--border);
+  border-radius: 14px; overflow: hidden;
+}
+.copy-block-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 20px; border-bottom: 0.5px solid var(--border);
+}
+.copy-block-label { font-size: 11px; color: var(--text3); font-family: 'DM Mono', monospace; letter-spacing: 0.06em; text-transform: uppercase; }
+.copy-btn {
+  font-size: 11px; font-weight: 500; color: var(--text2);
+  background: var(--bg3); border: 0.5px solid var(--border);
+  border-radius: 7px; padding: 5px 12px; cursor: pointer;
+  transition: all .15s; font-family: 'DM Sans', sans-serif;
+}
+.copy-btn:hover { color: var(--text); border-color: var(--border-hover); }
+.copy-btn.copied { color: var(--green); border-color: rgba(16,185,129,0.3); background: var(--green-dim); }
+.copy-content { padding: 20px 22px; font-size: 14px; line-height: 1.8; color: var(--text2); }
+.copy-content strong { color: var(--text); font-weight: 500; }
+.highlight-phrase {
+  background: var(--orange-dim); color: var(--orange);
+  border-radius: 4px; padding: 1px 5px;
+  font-size: 13px;
+}
+
+.email-meta { padding: 14px 20px; border-bottom: 0.5px solid var(--border); }
+.email-field { display: flex; gap: 10px; margin-bottom: 6px; }
+.email-field:last-child { margin-bottom: 0; }
+.email-field-label { font-size: 12px; color: var(--text3); min-width: 52px; font-family: 'DM Mono', monospace; }
+.email-field-value { font-size: 12px; color: var(--text2); }
+
+.tip-block {
+  background: var(--orange-glow); border: 0.5px solid rgba(255,92,53,0.12);
+  border-radius: 10px; padding: 12px 14px; margin-top: 14px;
+  display: flex; gap: 10px; align-items: flex-start;
+}
+.tip-icon { font-size: 12px; color: var(--orange); margin-top: 1px; flex-shrink: 0; font-family: 'DM Mono', monospace; font-weight: 700; }
+.tip-text { font-size: 12px; color: var(--text2); line-height: 1.6; }
+
+/* ── FOOTER ── */
+.footer-bar {
+  position: relative; z-index: 1;
+  border-top: 0.5px solid var(--border);
+  padding: 14px 28px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.footer-text { font-size: 11px; color: var(--text3); }
+.footer-amp { color: var(--orange); font-weight: 500; }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="logo">
+    <div class="logo-mark">
+      <svg viewBox="0 0 14 14" fill="none">
+        <path d="M1 10 L4 4 L7 8 L10 2 L13 10" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <span class="logo-name">Amplitude</span>
+    <span class="logo-sep">/</span>
+    <span class="logo-sub">Prospect Intelligence</span>
+  </div>
+  <div class="topbar-right">
+    <span class="version-badge">AI Week 2025</span>
+  </div>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-eyebrow">
+    <div class="eyebrow-line"></div>
+    Competitive Analysis
+    <div class="eyebrow-line"></div>
+  </div>
+  <div class="hero-company">
+    <div class="company-logo-wrap">B</div>
+    <div>
+      <div class="hero-title">BILL <span>AP/AR</span></div>
+    </div>
+  </div>
+  <div class="hero-meta">
+    <div class="meta-item"><div class="meta-dot"></div> G2 · App Store · Google Play · Trustpilot · Reddit</div>
+    <div class="meta-item"><div class="meta-dot amber"></div> 155+ negative reviews analyzed</div>
+    <div class="meta-item"><div class="meta-dot amber"></div> 5 complaint themes identified</div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs-wrap">
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('themes', this)">Complaint themes <span class="tab-num">5</span></button>
+    <button class="tab" onclick="showTab('map', this)">Amplitude map <span class="tab-num">5</span></button>
+    <button class="tab" onclick="showTab('opener', this)">Challenger opener</button>
+    <button class="tab" onclick="showTab('email', this)">Cold outreach</button>
+  </div>
+</div>
+
+<!-- CONTENT -->
+<div class="content">
+
+  <!-- PANEL: THEMES -->
+  <div id="panel-themes" class="panel active">
+    <div class="section-label">Filtered · Negative only · Ranked by volume</div>
+
+    <div class="theme-card">
+      <div class="theme-header">
+        <div class="rank r1">01</div>
+        <div class="theme-name">Support is unreachable and useless</div>
+      </div>
+      <div class="theme-desc">Users are looped between departments, wait 8–10 hours across multiple calls, and leave with nothing resolved. A single bad support interaction erases years of goodwill with the platform.</div>
+      <div class="vol-track"><div class="vol-fill v1"></div></div>
+      <div class="vol-label">~55 reviews · Highest volume across all sources</div>
+      <button class="quotes-toggle" onclick="toggleQuotes(this)"><span class="toggle-arrow">▶</span> Show quotes</button>
+      <div class="quotes">
+        <div class="quote-item">
+          <div class="quote-text">"There's no support. The product functions poorly. Support people are morons. Support process is non existent. They have no visibility across cases so when you have an issue (and you will), forget about actually getting help."</div>
+          <div class="quote-source">Trustpilot</div>
+        </div>
+        <div class="quote-item">
+          <div class="quote-text">"It took 8 hours of calling over 10 whole days to get my payment sorted. Truly the most useless people work in their service department."</div>
+          <div class="quote-source">App Store</div>
+        </div>
+        <div class="quote-item">
+          <div class="quote-text">"I've been trying to send an invoice for 1 week… try to connect to an alive person, but it keeps sending me to AI chat… and yet no answer."</div>
+          <div class="quote-source">Google Play</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="theme-card">
+      <div class="theme-header">
+        <div class="rank r2">02</div>
+        <div class="theme-name">Payment delays with zero status visibility</div>
+      </div>
+      <div class="theme-desc">Payments arrive late or not at all. Status shown in the app contradicts reality. Users have no reliable way to know when or how funds will arrive, leading to panic and churn.</div>
+      <div class="vol-track"><div class="vol-fill v2"></div></div>
+      <div class="vol-label">~38 reviews</div>
+      <button class="quotes-toggle" onclick="toggleQuotes(this)"><span class="toggle-arrow">▶</span> Show quotes</button>
+      <div class="quotes">
+        <div class="quote-item">
+          <div class="quote-text">"Bill.com's 'Instant Transfer' is a joke. They advertise it like payments will hit your account right away, but what they don't tell you is that it only works if the payer also has a Bill.com account."</div>
+          <div class="quote-source">Trustpilot</div>
+        </div>
+        <div class="quote-item">
+          <div class="quote-text">"I've been given 3 different dates on when my money is supposed to be in my account and have yet to receive it. Am I still getting my money? Who knows because this app is stupid and confusing."</div>
+          <div class="quote-source">App Store</div>
+        </div>
+        <div class="quote-item">
+          <div class="quote-text">"The AR side does not provide a failed send notice when an invoice is sent. This leads to delayed payments and a prolonged collections process."</div>
+          <div class="quote-source">G2</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="theme-card">
+      <div class="theme-header">
+        <div class="rank r3">03</div>
+        <div class="theme-name">Confusing and broken UX</div>
+      </div>
+      <div class="theme-desc">The app and web interface are disorienting and frequently break after updates, making routine tasks feel impossible and pushing users toward competitors.</div>
+      <div class="vol-track"><div class="vol-fill v3"></div></div>
+      <div class="vol-label">~28 reviews</div>
+      <button class="quotes-toggle" onclick="toggleQuotes(this)"><span class="toggle-arrow">▶</span> Show quotes</button>
+      <div class="quotes">
+        <div class="quote-item">
+          <div class="quote-text">"This software is so bad — horribly designed, horrible UI UX. I could make a better software in 24 hours."</div>
+          <div class="quote-source">Trustpilot</div>
+        </div>
+        <div class="quote-item">
+          <div class="quote-text">"After a recent update I can no longer change my default account to pay from. All the troubleshooting steps guide me to the way that used to work, but no longer does."</div>
+          <div class="quote-source">Google Play</div>
+        </div>
+        <div class="quote-item">
+          <div class="quote-text">"They really need to revamp the entire user interface. I am only using it because I am forced to do so by my company."</div>
+          <div class="quote-source">App Store</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="theme-card">
+      <div class="theme-header">
+        <div class="rank r4">04</div>
+        <div class="theme-name">Accounting integration sync failures</div>
+      </div>
+      <div class="theme-desc">Chronic sync errors with QuickBooks, Sage Intacct, and NetSuite corrupt historical data and force manual reconciliation, undermining the core automation promise.</div>
+      <div class="vol-track"><div class="vol-fill v4"></div></div>
+      <div class="vol-label">~20 reviews</div>
+      <button class="quotes-toggle" onclick="toggleQuotes(this)"><span class="toggle-arrow">▶</span> Show quotes</button>
+      <div class="quotes">
+        <div class="quote-item">
+          <div class="quote-text">"Sync issues have messed up our historical client data in QuickBooks."</div>
+          <div class="quote-source">G2</div>
+        </div>
+        <div class="quote-item">
+          <div class="quote-text">"You have to manually receive payments because Bill.com does not receive updates from QB. Bill.com reuses invoice numbers which causes lots of confusion and errors."</div>
+          <div class="quote-source">Capterra</div>
+        </div>
+        <div class="quote-item">
+          <div class="quote-text">"I was promised that all the functions regarding invoicing available in QB would be available in Bill.com and literally none of them are available."</div>
+          <div class="quote-source">Software Advice</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="theme-card">
+      <div class="theme-header">
+        <div class="rank r5">05</div>
+        <div class="theme-name">Onboarding and account access friction</div>
+      </div>
+      <div class="theme-desc">New user verification is absurdly complex and account access issues — password resets, unexpected terminations — are nearly impossible to resolve through support.</div>
+      <div class="vol-track"><div class="vol-fill v5"></div></div>
+      <div class="vol-label">~14 reviews</div>
+      <button class="quotes-toggle" onclick="toggleQuotes(this)"><span class="toggle-arrow">▶</span> Show quotes</button>
+      <div class="quotes">
+        <div class="quote-item">
+          <div class="quote-text">"The requirements and verification were so absurd to begin with that I legitimately questioned their legitimacy."</div>
+          <div class="quote-source">SmartCustomer</div>
+        </div>
+        <div class="quote-item">
+          <div class="quote-text">"It's just a goddamn simple password reset. This has been months now. I am talking to a brick wall."</div>
+          <div class="quote-source">Trustpilot</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PANEL: MAP -->
+  <div id="panel-map" class="panel">
+    <div class="section-label">Each complaint mapped to an Amplitude capability</div>
+
+    <div class="cap-card">
+      <div class="cap-header">
+        <span class="cap-rank">01</span>
+        <span class="cap-theme-name">Support is unreachable and useless</span>
+      </div>
+      <div class="cap-row">
+        <div class="cap-badge primary">Primary</div>
+        <div class="cap-text"><span class="cap-name">AI Assistant</span> — An in-product AI that resolves payment status, invoice, and workflow questions instantly eliminates the support ticket flood overwhelming their human team before users ever reach a hold queue.</div>
+      </div>
+      <div class="cap-divider"></div>
+      <div class="cap-row">
+        <div class="cap-badge secondary">Secondary</div>
+        <div class="cap-text"><span class="cap-name">AI Feedback</span> — Synthesizing the volume of support-complaint reviews at scale gives the product team a prioritized signal on which failure modes to address first, turning reactive firefighting into proactive roadmap decisions.</div>
+      </div>
+    </div>
+
+    <div class="cap-card">
+      <div class="cap-header">
+        <span class="cap-rank">02</span>
+        <span class="cap-theme-name">Payment delays with zero status visibility</span>
+      </div>
+      <div class="cap-row">
+        <div class="cap-badge primary">Primary</div>
+        <div class="cap-text"><span class="cap-name">Guides and Surveys</span> — Contextual in-app notifications that proactively surface payment status, expected arrival windows, and error alerts directly in the workflow eliminate the blind spots users hit today before they pick up the phone.</div>
+      </div>
+      <div class="cap-divider"></div>
+      <div class="cap-row">
+        <div class="cap-badge secondary">Secondary</div>
+        <div class="cap-text"><span class="cap-name">Session Replay</span> — Reproducing the exact moments users encounter contradictory payment status screens reveals which UI states trigger the most panic, giving the team precise targets to fix rather than guesses.</div>
+      </div>
+    </div>
+
+    <div class="cap-card">
+      <div class="cap-header">
+        <span class="cap-rank">03</span>
+        <span class="cap-theme-name">Confusing and broken UX</span>
+      </div>
+      <div class="cap-row">
+        <div class="cap-badge primary">Primary</div>
+        <div class="cap-text"><span class="cap-name">Session Replay</span> — Watching sessions where users rage-click, stall, or abandon reveals exactly which UI elements are broken or misunderstood without requiring users to articulate what went wrong in a support ticket.</div>
+      </div>
+      <div class="cap-divider"></div>
+      <div class="cap-row">
+        <div class="cap-badge secondary">Secondary</div>
+        <div class="cap-text"><span class="cap-name">Feature Experimentation</span> — A/B testing redesigned flows before shipping broadly ensures fixes actually improve completion rates rather than trading one point of confusion for another in the next update cycle.</div>
+      </div>
+    </div>
+
+    <div class="cap-card">
+      <div class="cap-header">
+        <span class="cap-rank">04</span>
+        <span class="cap-theme-name">Accounting integration sync failures</span>
+      </div>
+      <div class="cap-row">
+        <div class="cap-badge primary">Primary</div>
+        <div class="cap-text"><span class="cap-name">Product Analytics</span> — Funnel and journey analysis on integration-user cohorts reveals exactly where the sync flow breaks down and which user segments are most affected, giving engineering a precise fix target instead of anecdotal bug reports.</div>
+      </div>
+      <div class="cap-divider"></div>
+      <div class="cap-row">
+        <div class="cap-badge secondary">Secondary</div>
+        <div class="cap-text"><span class="cap-name">Feature Experimentation</span> — Validating new sync architecture against a control group before general rollout prevents the pattern users are already describing: new features breaking workflows that previously worked.</div>
+      </div>
+    </div>
+
+    <div class="cap-card">
+      <div class="cap-header">
+        <span class="cap-rank">05</span>
+        <span class="cap-theme-name">Onboarding and account access friction</span>
+      </div>
+      <div class="cap-row">
+        <div class="cap-badge primary">Primary</div>
+        <div class="cap-text"><span class="cap-name">Guides and Surveys</span> — Contextual onboarding flows and step-by-step tooltips guide new users through verification and setup, reducing drop-off at the moments that currently send users straight to an overloaded support queue.</div>
+      </div>
+      <div class="cap-divider"></div>
+      <div class="cap-row">
+        <div class="cap-badge secondary">Secondary</div>
+        <div class="cap-text"><span class="cap-name">Session Replay</span> — Watching new-user sessions during the onboarding funnel surfaces exactly which verification steps cause abandonment, giving the team data to act on without waiting for frustrated support tickets to accumulate.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PANEL: OPENER -->
+  <div id="panel-opener" class="panel">
+    <div class="section-label">Spoken word · First 60 seconds · No product mentioned</div>
+
+    <div class="copy-block">
+      <div class="copy-block-header">
+        <div class="copy-block-label">Challenger opener</div>
+        <button class="copy-btn" onclick="copyText('opener-text', this)">Copy</button>
+      </div>
+      <div class="copy-content" id="opener-text">
+        Something we hear consistently from fintech teams right now is that their users' biggest frustration isn't the core functionality of the product — <strong>it's what happens the moment something goes wrong.</strong> When a payment is delayed or a status looks off, users want an immediate answer, and the second they can't get one, trust in the entire platform starts to erode regardless of how well everything else works.<br><br>
+        We've also seen a specific pattern where <strong>users know a payment is "processing" but have no idea whether it will arrive in two hours or two weeks</strong> — and that opacity, more than the delay itself, is what drives churn and negative reviews. The product team is often the last to know because the signal is buried in support tickets and one-star reviews rather than visible in the product data.<br><br>
+        I'd love to understand how you're thinking about both of those problems today, because in our experience the gap between what users expect in those moments and what they actually experience is almost always larger than what shows up in internal dashboards.
+      </div>
+    </div>
+
+    <div class="tip-block" style="margin-top: 16px;">
+      <div class="tip-icon">→</div>
+      <div class="tip-text">End on the question and let it sit. The goal is for them to validate or deepen the diagnosis — not to start pitching. If they say "yeah that's exactly right," you've already won the meeting.</div>
+    </div>
+  </div>
+
+  <!-- PANEL: EMAIL -->
+  <div id="panel-email" class="panel">
+    <div class="section-label">Cold outreach · Pre-meeting · No bullets · No em dashes · Consultative tone</div>
+
+    <div class="copy-block">
+      <div class="copy-block-header">
+        <div class="copy-block-label">Cold outreach email</div>
+        <button class="copy-btn" onclick="copyText('email-full', this)">Copy</button>
+      </div>
+      <div class="email-meta">
+        <div class="email-field">
+          <div class="email-field-label">Subject</div>
+          <div class="email-field-value">What BILL's users are saying</div>
+        </div>
+      </div>
+      <div class="copy-content" id="email-full">
+        I spent some time going through BILL's user reviews across G2, the App Store, and Trustpilot and two patterns show up in almost every complaint thread: users have no reliable visibility into payment status once a transaction is in flight, and when something goes wrong, reaching a human who can actually resolve it takes days rather than minutes.<br><br>
+        What struck me is that both of those problems are instrumentation gaps more than they are support staffing gaps — the product team likely doesn't have a clear view of where users are stalling, what they're trying to find, or which moments are triggering the calls that overwhelm the support queue.<br><br>
+        I have a point of view on how companies in your space have closed that gap and what the measurement looked like in the first 90 days. Would it be worth 25 minutes to walk through it?
+      </div>
+    </div>
+
+    <div class="tip-block" style="margin-top: 16px;">
+      <div class="tip-icon">→</div>
+      <div class="tip-text">Swap "BILL's user reviews" for the prospect's company name. The framing — instrumentation gap, not headcount gap — is the line that usually lands. It reframes the conversation from "your support team is bad" to "your product team is flying blind."</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<div class="footer-bar">
+  <div class="footer-text">Built for <span class="footer-amp">Amplitude</span> AI Week · Prospect intelligence prototype</div>
+  <div class="footer-text">BILL AP/AR · 155+ reviews analyzed</div>
+</div>
+
+<script>
+function showTab(id, btn) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+function toggleQuotes(btn) {
+  const quotes = btn.nextElementSibling;
+  const open = quotes.classList.toggle('open');
+  btn.classList.toggle('open', open);
+  btn.querySelector('.toggle-arrow').style.transform = open ? 'rotate(90deg)' : '';
+  btn.childNodes[1].textContent = open ? ' Hide quotes' : ' Show quotes';
+}
+
+function copyText(id, btn) {
+  const el = document.getElementById(id);
+  const text = el.innerText || el.textContent;
+  navigator.clipboard.writeText(text.trim()).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = 'Copied';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 1800);
+  });
+}
+</script>
+</body>
+</html>
